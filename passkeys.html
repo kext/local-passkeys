@@ -13,7 +13,7 @@
     <header><span class="brand-icon" aria-hidden="true"></span><div><p class="brand">Local Passkeys</p><h1>Stored passkeys</h1></div></header>
     <p class="description">Manage the passkeys saved in this browser.</p>
     <p class="note">Deleting a passkey here removes its private key from this add-on. It does not remove the website registration.</p>
-    <div class="toolbar"><p id="count" role="status">Loading passkeys…</p><button id="refresh" type="button">Refresh</button></div>
+    <div class="toolbar"><p id="count" role="status">Loading passkeys…</p></div>
     <p id="error" role="alert" hidden></p>
     <div class="table-wrap" tabindex="0" role="region" aria-label="Stored passkeys table">
       <table>
@@ -23,7 +23,6 @@
       </table>
     </div>
     <p id="empty" hidden>No passkeys are stored yet. Register one through a website that supports passkeys.</p>
-    <p class="footnote">Older entries show the RP ID when the original website URL is unavailable.</p>
   </main>
   <dialog id="deleteDialog" aria-labelledby="deleteTitle" aria-describedby="deleteDescription deleteAccount">
     <form method="dialog">
