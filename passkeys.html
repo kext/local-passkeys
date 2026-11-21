@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Stored passkeys · Local Passkeys</title>
     <link rel="icon" href="icons/key.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="passkeys.css" />
+    <link rel="stylesheet" href="styles.css" />
     <script src="passkeys.js" defer></script>
   </head>
   <body>
-    <main>
-      <header>
+    <main class="manager-content">
+      <header class="page-header">
         <span class="brand-icon" aria-hidden="true"></span>
         <div>
           <p class="brand">Local Passkeys</p>
-          <h1>Stored passkeys</h1>
+          <h1 class="page-heading">Stored passkeys</h1>
         </div>
       </header>
       <p class="description">Manage the passkeys saved in this browser.</p>
@@ -23,16 +23,16 @@
         does not remove the website registration.
       </p>
       <div class="toolbar">
-        <p id="count" role="status">Loading passkeys…</p>
+        <p id="count" class="count" role="status">Loading passkeys…</p>
       </div>
-      <p id="error" role="alert" hidden></p>
+      <p id="error" class="message error-message" role="alert" hidden></p>
       <div
         class="table-wrap"
         tabindex="0"
         role="region"
         aria-label="Stored passkeys table"
       >
-        <table>
+        <table class="table">
           <caption class="sr-only">
             Passkeys saved in this browser
           </caption>
@@ -47,25 +47,32 @@
           <tbody id="entries"></tbody>
         </table>
       </div>
-      <p id="empty" hidden>
+      <p id="empty" class="empty" hidden>
         No passkeys are stored yet. Register one through a website that supports
         passkeys.
       </p>
     </main>
     <dialog
       id="deleteDialog"
+      class="dialog"
       aria-labelledby="deleteTitle"
       aria-describedby="deleteDescription deleteAccount"
     >
       <form method="dialog">
         <h2 id="deleteTitle">Delete this passkey?</h2>
-        <p id="deleteAccount"></p>
-        <p id="deleteDescription">
+        <p id="deleteAccount" class="dialog-account"></p>
+        <p id="deleteDescription" class="muted">
           This removes the saved private key. You cannot undo this action. Make
           sure you have another way to sign in.
         </p>
-        <div class="dialog-actions">
-          <button id="cancelDelete" type="submit" value="cancel" autofocus>
+        <div class="actions">
+          <button
+            id="cancelDelete"
+            class="secondary"
+            type="submit"
+            value="cancel"
+            autofocus
+          >
             Cancel</button
           ><button class="danger" type="submit" value="delete">
             Delete passkey
