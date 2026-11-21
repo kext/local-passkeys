@@ -1,0 +1,11 @@
+{
+  "name": "local-passkeys",
+  "private": true,
+  "scripts": {
+    "build": "bun run build.js",
+    "lint": "web-ext lint"
+  },
+  "devDependencies": {
+    "web-ext": "^10.8.0"
+  }
+}

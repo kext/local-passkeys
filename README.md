@@ -1,10 +1,12 @@
 # Local Passkeys
 
-Local Passkeys is a Firefox add-on that creates and stores passkeys inside your browser.
+An experimental Firefox add-on for creating, using, and managing passkeys stored locally in your browser. No separate account, cloud service, or companion application required.
 
-Use it to register passkeys, sign into websites, and manage your saved credentials. It needs no account, cloud service, or companion application.
+Do not use it for important accounts. Keep another way to sign in: there is no backup or forgotten-password recovery.
 
-The add-on encrypts each private key with a PIN or password you choose. Account names and website details remain unencrypted.
+Each private key is encrypted with a PIN or password you choose. Account names and website details remain unencrypted.
+
+This project was developed with AI assistance and has not undergone an independent security review.
 
 ## Requirements
 
@@ -56,19 +58,31 @@ When several accounts are available, you can choose a default for that website. 
 
 ## Replace a passkey
 
-The add-on keeps one passkey for each combination of website RP ID and account identifier.
+Registering another passkey for the same account can replace its existing local credential. The popup asks you to approve this explicitly.
 
-If you register another passkey for that combination, the popup shows a warning and a “Replace passkey” button.
+Replacement creates a new key pair. The add-on saves the new credential before deleting the matching old local credentials.
 
-Replacement saves the new credential before deleting the matching local credentials. It creates a new key pair and records the registration time.
+Keep another way to sign in before replacing a passkey. If the website rejects the new registration, the add-on keeps the new local record but does not restore the deleted keys.
 
-If the website rejects registration afterward, the add-on does not restore the deleted keys.
+Accounts are matched using the website’s RP ID and WebAuthn user handle, not the displayed account name.
 
 ## Manage saved passkeys
 
 Select the add-on’s toolbar button, then choose “Manage passkeys.”
 
 The overview lists each credential’s website URL, display name, and account name. The table updates automatically when stored credentials change.
+
+To change a passkey’s PIN or password:
+
+1. Select its pencil button.
+2. Enter the current PIN or password.
+3. Enter the new PIN or password twice.
+4. Select “Save.”
+
+This re-encrypts the existing private key. It does not replace the passkey
+or require another registration on the website.
+
+You must know the current PIN or password to change it.
 
 To delete an entry:
 
@@ -112,7 +126,6 @@ Local Passkeys is experimental software. Keep another login method for every acc
 - Passkeys stay in this browser profile.
 - No synchronization, backup, or export feature exists.
 - No forgotten-secret recovery exists.
-- No interface exists for changing an unlocking secret.
 - Removing the add-on or its storage can permanently destroy the saved keys.
 
 ### Website compatibility
@@ -140,8 +153,27 @@ A record without a stored origin displays “URL unavailable.” The add-on reco
 
 Passkey scope uses the RP ID, which contains no protocol or port. Services on `localhost` with different ports therefore share that scope.
 
-### Development status
+## Development
 
-The add-on does not include an independent security review or comprehensive Firefox compatibility testing.
+Requires Bun 1.4.4 or later.
 
-Do not use it as the only login method for an important account.
+Install development dependencies:
+
+    bun install
+
+Format the source, validate the extension, and build a package:
+
+    bun run build
+
+The generated ZIP is written to `web-ext-artifacts/`. It is unsigned;
+creating an installable release requires Mozilla signing.
+
+## License
+
+Except for the icons, this project is dedicated to the public domain under
+CC0 1.0 Universal. See [LICENSE](LICENSE) for the full legal text.
+
+The icons are from [Lucide](https://lucide.dev/) and are not covered by
+the project's CC0 dedication. They are distributed under the ISC license,
+with additional MIT terms for icons derived from Feather.
+See [icons/LICENSE](icons/LICENSE) for the full license and copyright notices.

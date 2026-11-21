@@ -2,11 +2,18 @@
   "manifest_version": 2,
   "name": "Local Passkeys",
   "version": "0.0.1",
-  "description": "Local software passkeys with encrypted private keys and account management. Experimental.",
+  "description": "Create and use passkeys stored locally in Firefox, protected by a PIN or password. No account, server, or companion app required.",
+  "developer": {
+    "name": "kext",
+    "url": "https://github.com/kext/local-passkeys"
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "local-passkeys@kext.de",
-      "strict_min_version": "149.0"
+      "strict_min_version": "149.0",
+      "data_collection_permissions": {
+        "required": ["authenticationInfo"]
+      }
     }
   },
   "permissions": [

@@ -1,0 +1,10 @@
+node_modules/
+web-ext-artifacts/
+
+# OS Files
+.DS_Store
+._*
+*~
+~*
+Thumbs.db
+desktop.ini
