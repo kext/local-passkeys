@@ -1,0 +1,12 @@
+:root { color-scheme: light dark; font: 15px system-ui, sans-serif; }
+body { width: 350px; margin: 20px; line-height: 1.45; }
+h1 { font-size: 1.25rem; margin-top: 0; }
+#origin, #accountLabel { overflow-wrap: anywhere; }
+label { display: block; margin-top: 12px; }
+input[type="password"], select { box-sizing: border-box; width: 100%; padding: 9px; margin-top: 5px; font: inherit; }
+button { padding: 8px 14px; font: inherit; cursor: pointer; }
+.buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.check { display: flex; align-items: start; gap: 7px; }
+.hint { font-size: .85rem; }
+#error { color: light-dark(#a31818, #ffaaaa); }
+[hidden] { display: none !important; }

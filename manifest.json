@@ -1,16 +1,26 @@
 {
   "manifest_version": 2,
-  "name": "Local Passkeys Prototype",
-  "version": "0.1.1",
-  "description": "Development prototype for passkey approval in a toolbar popup.",
+  "name": "Local Passkeys",
+  "version": "0.2.0",
+  "description": "Local software passkeys with password-encrypted private keys. Experimental.",
   "browser_specific_settings": {
     "gecko": {
       "id": "local-passkeys-prototype@example.invalid",
       "strict_min_version": "149.0"
     }
   },
+  "permissions": [
+    "storage",
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
   "background": {
     "scripts": [
+      "utils.js",
+      "storage.js",
+      "keys.js",
+      "webauthn.js",
       "background.js"
     ],
     "persistent": true

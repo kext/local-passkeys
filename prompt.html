@@ -4,22 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local Passkeys</title>
-  <style>
-    :root { color-scheme: light dark; font: 16px system-ui, sans-serif; }
-    body { width: 340px; margin: 20px; line-height: 1.5; }
-    h1 { font-size: 1.25rem; }
-    #origin { overflow-wrap: anywhere; }
-    button { padding: 8px 20px; font: inherit; cursor: pointer; }
-  </style>
+  <link rel="stylesheet" href="prompt.css">
   <script src="prompt.js" defer></script>
 </head>
 <body>
   <main>
     <h1 id="heading">Local Passkeys</h1>
     <p id="origin">No pending request.</p>
-    <p>Account: unavailable in this prototype.</p>
-    <p>This version creates no keys and requests no PIN.</p>
-    <button id="cancel" type="button">Cancel</button>
+    <form id="approval" hidden>
+      <label for="account">Account</label>
+      <select id="account"></select>
+      <p id="accountLabel" hidden></p>
+      <label for="secret">PIN or password</label>
+      <input id="secret" type="password" required maxlength="1024" autocomplete="off" spellcheck="false">
+      <div id="confirmation" hidden>
+        <label for="confirm">Confirm PIN or password</label>
+        <input id="confirm" type="password" maxlength="1024" autocomplete="off">
+        <p class="hint">Use a long secret. Short PINs offer limited protection against copied storage.</p>
+      </div>
+      <label id="defaultLabel" class="check" hidden><input id="makeDefault" type="checkbox"> Use as default for this website</label>
+      <p id="error" role="alert" aria-live="polite"></p>
+      <div class="buttons"><button id="cancel" type="button">Cancel</button><button id="submit" type="submit">Sign in</button></div>
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+    <p id="notice">Start registration or login on a website that supports passkeys.</p>
   </main>
 </body>
 </html>

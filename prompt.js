@@ -1,10 +1,78 @@
+"use strict";
+const byId = id => document.getElementById(id);
 const port = browser.runtime.connect({ name: 'approval-popup' });
+let operation;
+let accounts = [];
+function clearSecrets() { byId('secret').value = ''; byId('confirm').value = ''; }
+function busy(value) {
+  for (const id of ['account', 'secret', 'confirm', 'makeDefault', 'submit']) byId(id).disabled = value;
+  byId('status').textContent = value ? 'Processing…' : '';
+}
 port.onMessage.addListener(message => {
-  document.getElementById('heading').textContent = message.operation === 'create' ? 'Create a passkey' : 'Sign in';
-  document.getElementById('origin').textContent = message.origin;
+  if (message.kind === 'close') { clearSecrets(); window.close(); return; }
+  if (message.kind === 'error') {
+    busy(false);
+    clearSecrets();
+    byId('error').textContent = message.message;
+    byId('secret').focus();
+    return;
+  }
+  if (message.kind !== 'request') return;
+  operation = message.operation;
+  accounts = message.accounts;
+  byId('heading').textContent = operation === 'create' ? 'Create a passkey' : 'Sign in';
+  byId('origin').textContent = message.origin;
+  byId('notice').hidden = true;
+  byId('approval').hidden = false;
+  byId('submit').textContent = operation === 'create' ? 'Create passkey' : 'Sign in';
+  byId('confirmation').hidden = operation !== 'create';
+  byId('confirm').required = operation === 'create';
+  if (operation === 'create') {
+    byId('account').hidden = true;
+    byId('accountLabel').hidden = false;
+    byId('accountLabel').textContent = message.account;
+  } else {
+    const groups = new Map();
+    for (const account of accounts) {
+      if (!groups.has(account.userHandle)) groups.set(account.userHandle, []);
+      groups.get(account.userHandle).push(account);
+    }
+    for (const group of groups.values()) {
+      const chosen = group.find(item => item.id === message.defaultId) || group[0];
+      byId('account').add(new Option(chosen.displayName && chosen.displayName !== chosen.name ? `${chosen.name} — ${chosen.displayName}` : chosen.name, chosen.id));
+    }
+    if (accounts.some(item => item.id === message.defaultId)) byId('account').value = message.defaultId;
+    byId('defaultLabel').hidden = groups.size < 2;
+    if (groups.size === 1) {
+      byId('account').hidden = true;
+      byId('accountLabel').hidden = false;
+      byId('accountLabel').textContent = byId('account').selectedOptions[0].textContent;
+    }
+    if (!accounts.length) {
+      byId('error').textContent = 'No stored passkey matches this request. Register one through the website first.';
+      byId('submit').disabled = true;
+      byId('secret').disabled = true;
+    }
+  }
+  byId('secret').focus();
 });
-port.onDisconnect.addListener(() => window.close());
-document.getElementById('cancel').addEventListener('click', () => {
+port.onDisconnect.addListener(() => { clearSecrets(); window.close(); });
+byId('cancel').addEventListener('click', () => {
+  clearSecrets();
   port.postMessage({ kind: 'cancel' });
   window.close();
 });
+byId('approval').addEventListener('submit', event => {
+  event.preventDefault();
+  byId('error').textContent = '';
+  if (operation === 'create' && byId('secret').value !== byId('confirm').value) {
+    byId('error').textContent = 'The secrets do not match.';
+    byId('confirm').focus();
+    return;
+  }
+  const secret = byId('secret').value;
+  clearSecrets();
+  busy(true);
+  port.postMessage({ kind: 'approve', secret, credentialId: byId('account').value, makeDefault: byId('makeDefault').checked });
+});
+window.addEventListener('pagehide', clearSecrets);
