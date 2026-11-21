@@ -1,5 +1,5 @@
 (() => {
-  const channel = "local-passkeys-v2";
+  const channel = "local-passkeys";
   const active = new Map();
   const reply = (id, payload) =>
     window.postMessage(

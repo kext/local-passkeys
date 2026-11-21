@@ -1,5 +1,5 @@
 (() => {
-  const channel = "local-passkeys-v2";
+  const channel = "local-passkeys";
   const credentials = navigator.credentials;
   if (!credentials || !window.isSecureContext) return;
   const pending = new Map();

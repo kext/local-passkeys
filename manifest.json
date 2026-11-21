@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
   "name": "Local Passkeys",
-  "version": "0.3.0",
+  "version": "0.0.1",
   "description": "Local software passkeys with encrypted private keys and account management. Experimental.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "local-passkeys-prototype@example.invalid",
+      "id": "local-passkeys@kext.de",
       "strict_min_version": "149.0"
     }
   },
