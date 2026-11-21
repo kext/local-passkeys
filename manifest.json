@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "name": "Local Passkeys Prototype",
+  "version": "0.1.1",
+  "description": "Development prototype for passkey approval in a toolbar popup.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "local-passkeys-prototype@example.invalid",
+      "strict_min_version": "149.0"
+    }
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "Local Passkeys",
+    "default_popup": "prompt.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*"
+      ],
+      "js": [
+        "page.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
