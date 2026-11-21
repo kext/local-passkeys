@@ -1,40 +1,53 @@
 "use strict";
-const byId = id => document.getElementById(id);
-const port = browser.runtime.connect({ name: 'approval-popup' });
+const byId = (id) => document.getElementById(id);
+const port = browser.runtime.connect({ name: "approval-popup" });
 let operation;
 let accounts = [];
 let replaceExisting = false;
-function clearSecrets() { byId('secret').value = ''; byId('confirm').value = ''; }
-function busy(value) {
-  for (const id of ['account', 'secret', 'confirm', 'makeDefault', 'submit']) byId(id).disabled = value;
-  byId('status').textContent = value ? 'Processing…' : '';
+function clearSecrets() {
+  byId("secret").value = "";
+  byId("confirm").value = "";
 }
-port.onMessage.addListener(message => {
-  if (message.kind === 'close') { clearSecrets(); window.close(); return; }
-  if (message.kind === 'error') {
-    busy(false);
+function busy(value) {
+  for (const id of ["account", "secret", "confirm", "makeDefault", "submit"])
+    byId(id).disabled = value;
+  byId("status").textContent = value ? "Processing…" : "";
+}
+port.onMessage.addListener((message) => {
+  if (message.kind === "close") {
     clearSecrets();
-    byId('error').textContent = message.message;
-    byId('secret').focus();
+    window.close();
     return;
   }
-  if (message.kind !== 'request') return;
+  if (message.kind === "error") {
+    busy(false);
+    clearSecrets();
+    byId("error").textContent = message.message;
+    byId("secret").focus();
+    return;
+  }
+  if (message.kind !== "request") return;
   operation = message.operation;
   accounts = message.accounts;
-  replaceExisting = operation === 'create' && message.replacementCount > 0;
-  const action = operation === 'create' ? (replaceExisting ? 'Replace passkey' : 'Create passkey') : 'Sign in';
-  byId('heading').textContent = action;
-  byId('origin').textContent = message.origin;
-  byId('notice').hidden = true;
-  byId('approval').hidden = false;
-  byId('submit').textContent = action;
-  byId('replacementWarning').hidden = !replaceExisting;
-  byId('confirmation').hidden = operation !== 'create';
-  byId('confirm').required = operation === 'create';
-  if (operation === 'create') {
-    byId('account').hidden = true;
-    byId('accountLabel').hidden = false;
-    byId('accountLabel').textContent = message.account;
+  replaceExisting = operation === "create" && message.replacementCount > 0;
+  const action =
+    operation === "create"
+      ? replaceExisting
+        ? "Replace passkey"
+        : "Create passkey"
+      : "Sign in";
+  byId("heading").textContent = action;
+  byId("origin").textContent = message.origin;
+  byId("notice").hidden = true;
+  byId("approval").hidden = false;
+  byId("submit").textContent = action;
+  byId("replacementWarning").hidden = !replaceExisting;
+  byId("confirmation").hidden = operation !== "create";
+  byId("confirm").required = operation === "create";
+  if (operation === "create") {
+    byId("account").hidden = true;
+    byId("accountLabel").hidden = false;
+    byId("accountLabel").textContent = message.account;
   } else {
     const groups = new Map();
     for (const account of accounts) {
@@ -42,41 +55,64 @@ port.onMessage.addListener(message => {
       groups.get(account.userHandle).push(account);
     }
     for (const group of groups.values()) {
-      const chosen = group.find(item => item.id === message.defaultId) || group[0];
-      byId('account').add(new Option(chosen.displayName && chosen.displayName !== chosen.name ? `${chosen.name} — ${chosen.displayName}` : chosen.name, chosen.id));
+      const chosen =
+        group.find((item) => item.id === message.defaultId) || group[0];
+      byId("account").add(
+        new Option(
+          chosen.displayName && chosen.displayName !== chosen.name
+            ? `${chosen.name} — ${chosen.displayName}`
+            : chosen.name,
+          chosen.id,
+        ),
+      );
     }
-    if (accounts.some(item => item.id === message.defaultId)) byId('account').value = message.defaultId;
-    byId('defaultLabel').hidden = groups.size < 2;
+    if (accounts.some((item) => item.id === message.defaultId))
+      byId("account").value = message.defaultId;
+    byId("defaultLabel").hidden = groups.size < 2;
     if (groups.size === 1) {
-      byId('account').hidden = true;
-      byId('accountLabel').hidden = false;
-      byId('accountLabel').textContent = byId('account').selectedOptions[0].textContent;
+      byId("account").hidden = true;
+      byId("accountLabel").hidden = false;
+      byId("accountLabel").textContent =
+        byId("account").selectedOptions[0].textContent;
     }
     if (!accounts.length) {
-      byId('error').textContent = 'No stored passkey matches this request. Register one through the website first.';
-      byId('submit').disabled = true;
-      byId('secret').disabled = true;
+      byId("error").textContent =
+        "No stored passkey matches this request. Register one through the website first.";
+      byId("submit").disabled = true;
+      byId("secret").disabled = true;
     }
   }
-  byId('secret').focus();
+  byId("secret").focus();
 });
-port.onDisconnect.addListener(() => { clearSecrets(); window.close(); });
-byId('cancel').addEventListener('click', () => {
+port.onDisconnect.addListener(() => {
   clearSecrets();
-  port.postMessage({ kind: 'cancel' });
   window.close();
 });
-byId('approval').addEventListener('submit', event => {
+byId("cancel").addEventListener("click", () => {
+  clearSecrets();
+  port.postMessage({ kind: "cancel" });
+  window.close();
+});
+byId("approval").addEventListener("submit", (event) => {
   event.preventDefault();
-  byId('error').textContent = '';
-  if (operation === 'create' && byId('secret').value !== byId('confirm').value) {
-    byId('error').textContent = 'The secrets do not match.';
-    byId('confirm').focus();
+  byId("error").textContent = "";
+  if (
+    operation === "create" &&
+    byId("secret").value !== byId("confirm").value
+  ) {
+    byId("error").textContent = "The secrets do not match.";
+    byId("confirm").focus();
     return;
   }
-  const secret = byId('secret').value;
+  const secret = byId("secret").value;
   clearSecrets();
   busy(true);
-  port.postMessage({ kind: 'approve', secret, credentialId: byId('account').value, makeDefault: byId('makeDefault').checked, replaceExisting });
+  port.postMessage({
+    kind: "approve",
+    secret,
+    credentialId: byId("account").value,
+    makeDefault: byId("makeDefault").checked,
+    replaceExisting,
+  });
 });
-window.addEventListener('pagehide', clearSecrets);
+window.addEventListener("pagehide", clearSecrets);
