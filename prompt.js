@@ -3,6 +3,7 @@ const byId = id => document.getElementById(id);
 const port = browser.runtime.connect({ name: 'approval-popup' });
 let operation;
 let accounts = [];
+let replaceExisting = false;
 function clearSecrets() { byId('secret').value = ''; byId('confirm').value = ''; }
 function busy(value) {
   for (const id of ['account', 'secret', 'confirm', 'makeDefault', 'submit']) byId(id).disabled = value;
@@ -20,11 +21,14 @@ port.onMessage.addListener(message => {
   if (message.kind !== 'request') return;
   operation = message.operation;
   accounts = message.accounts;
-  byId('heading').textContent = operation === 'create' ? 'Create a passkey' : 'Sign in';
+  replaceExisting = operation === 'create' && message.replacementCount > 0;
+  const action = operation === 'create' ? (replaceExisting ? 'Replace passkey' : 'Create passkey') : 'Sign in';
+  byId('heading').textContent = action;
   byId('origin').textContent = message.origin;
   byId('notice').hidden = true;
   byId('approval').hidden = false;
-  byId('submit').textContent = operation === 'create' ? 'Create passkey' : 'Sign in';
+  byId('submit').textContent = action;
+  byId('replacementWarning').hidden = !replaceExisting;
   byId('confirmation').hidden = operation !== 'create';
   byId('confirm').required = operation === 'create';
   if (operation === 'create') {
@@ -73,6 +77,6 @@ byId('approval').addEventListener('submit', event => {
   const secret = byId('secret').value;
   clearSecrets();
   busy(true);
-  port.postMessage({ kind: 'approve', secret, credentialId: byId('account').value, makeDefault: byId('makeDefault').checked });
+  port.postMessage({ kind: 'approve', secret, credentialId: byId('account').value, makeDefault: byId('makeDefault').checked, replaceExisting });
 });
 window.addEventListener('pagehide', clearSecrets);

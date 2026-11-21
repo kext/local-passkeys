@@ -15,6 +15,7 @@
       <label for="account">Account</label>
       <select id="account"></select>
       <p id="accountLabel" hidden></p>
+      <p id="replacementWarning" role="note" hidden>A passkey already exists for this account. Replacing it deletes all saved private keys for this account on this website. This cannot be undone. The old keys will not return if the website rejects registration.</p>
       <label for="secret">PIN or password</label>
       <input id="secret" type="password" required maxlength="1024" autocomplete="off" spellcheck="false">
       <div id="confirmation" hidden>

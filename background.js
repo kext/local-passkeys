@@ -31,7 +31,7 @@ browser.runtime.onConnect.addListener(port => {
     request.popup = port;
     port.onDisconnect.addListener(() => cancel(request));
     const prepared = request.prepared;
-    safeSend(port, { kind: 'request', operation: prepared.operation, origin: request.origin, account: prepared.account, defaultId: request.defaultId, accounts: prepared.records.map(record => ({ id: record.credentialId, userHandle: record.userHandle, name: record.userName, displayName: record.displayName })) });
+    safeSend(port, { kind: 'request', operation: prepared.operation, origin: request.origin, account: prepared.account, replacementCount: request.replacementCount, defaultId: request.defaultId, accounts: prepared.records.map(record => ({ id: record.credentialId, userHandle: record.userHandle, name: record.userName, displayName: record.displayName })) });
     port.onMessage.addListener(async message => {
       if (message?.kind === 'cancel') { cancel(request); return; }
       if (message?.kind !== 'approve' || pending !== request || request.busy) return;
@@ -43,9 +43,10 @@ browser.runtime.onConnect.addListener(port => {
         if (!(await active(request))) { cancel(request); return; }
         let result;
         if (prepared.operation === 'create') {
+          if (request.replacementCount && message.replaceExisting !== true) throw new Error('Confirm replacement of the existing passkey.');
           const created = await App.webauthn.register(prepared, secret);
           if (!(await active(request))) { cancel(request); return; }
-          await App.storage.save(created.record, false);
+          await App.storage.save(created.record, false, message.replaceExisting === true);
           result = created.result;
         } else {
           const record = prepared.records.find(item => item.credentialId === message.credentialId);
@@ -75,11 +76,14 @@ browser.runtime.onConnect.addListener(port => {
   port.onDisconnect.addListener(() => cancel(request));
   port.onMessage.addListener(async message => {
     if (request || pending || !['create', 'get'].includes(message?.operation)) { port.disconnect(); return; }
-    request = { port, origin, tabId: sender.tab.id, windowId: sender.tab.windowId, busy: false };
+    request = { port, origin, tabId: sender.tab.id, windowId: sender.tab.windowId, busy: false, replacementCount: 0 };
     pending = request;
     request.timer = setTimeout(() => cancel(request), 120000);
     try {
       request.prepared = await App.webauthn.prepare(message.operation, message.options, origin);
+      if (message.operation === 'create') {
+        request.replacementCount = (await App.storage.list()).filter(record => record.rpId === request.prepared.rpId && record.userHandle === request.prepared.options.user.id).length;
+      }
       request.defaultId = await App.storage.defaultFor(request.prepared.rpId);
       if (!(await active(request))) { cancel(request); return; }
       await browser.browserAction.openPopup({ windowId: request.windowId });
