@@ -42,12 +42,13 @@ browser.runtime.onMessage.addListener((message, sender) => {
       .then((records) => ({ records: records.map(managementMetadata) }))
       .catch(() => ({ error: "Could not read the stored passkeys." }));
   }
-  if (message?.type !== "passkeys:delete") return;
+  if (!["passkeys:delete", "passkeys:change-secret"].includes(message?.type))
+    return;
   return (async () => {
     if (pending || managementDeleting)
       return {
         error:
-          "Finish or cancel the current passkey request before deleting an entry.",
+          "Finish or cancel the current passkey request before changing or deleting an entry.",
       };
     if (
       typeof message.credentialId !== "string" ||
@@ -59,6 +60,42 @@ browser.runtime.onMessage.addListener((message, sender) => {
       const record = (await App.storage.list()).find(
         (item) => item.credentialId === message.credentialId,
       );
+      if (message.type === "passkeys:change-secret") {
+        let currentSecret = message.currentSecret;
+        let newSecret = message.newSecret;
+        message.currentSecret = "";
+        message.newSecret = "";
+        try {
+          if (!record) throw new Error("This passkey no longer exists.");
+          if (
+            [currentSecret, newSecret].some(
+              (value) =>
+                typeof value !== "string" ||
+                !value.length ||
+                value.length > 1024,
+            )
+          )
+            throw new Error(
+              "Enter a PIN or password of at most 1024 characters.",
+            );
+          const update = await App.keys.changeSecret(
+            record,
+            currentSecret,
+            newSecret,
+          );
+          await browser.storage.local.set({
+            [`credential:${record.credentialId}`]: { ...record, ...update },
+          });
+          return { ok: true };
+        } catch (error) {
+          return {
+            error: error.message || "Could not change the PIN or password.",
+          };
+        } finally {
+          currentSecret = "";
+          newSecret = "";
+        }
+      }
       if (!record) return { ok: true };
       await browser.storage.local.remove(`credential:${record.credentialId}`);
       const defaultKey = `default:${record.rpId}`;

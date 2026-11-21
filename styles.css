@@ -325,27 +325,57 @@ select.field {
 .table tr:last-child td {
   border-bottom: 0;
 }
-.row-actions {
-  width: 76px;
+.table .row-actions {
+  width: 120px;
+  min-width: 120px;
+  white-space: nowrap;
   text-align: right;
+  padding: 10px;
 }
+.edit-button,
 .delete-button {
   display: inline-flex;
+  vertical-align: middle;
   align-items: center;
   justify-content: center;
   width: 42px;
+  height: 42px;
+  min-width: 42px;
   padding: 8px;
-  border-color: transparent;
-  background: transparent;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  flex: none;
+}
+.edit-button {
+  margin-right: 6px;
+  color: var(--text);
+}
+.delete-button {
   color: var(--danger);
+}
+.edit-button:hover:not(:disabled) {
+  border-color: var(--muted);
+  background: var(--hover);
 }
 .delete-button:hover:not(:disabled) {
   border-color: var(--danger);
   background: var(--danger-bg);
 }
+.edit-icon,
 .delete-icon {
+  display: block;
+  flex: none;
   width: 20px;
   height: 20px;
+  background: currentColor;
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+.edit-icon {
+  mask-image: url("icons/pencil.svg");
+}
+.delete-icon {
   mask-image: url("icons/delete.svg");
 }
 .empty {
@@ -441,6 +471,7 @@ select.field {
     outline: 2px solid Highlight;
   }
   .brand-icon,
+  .edit-icon,
   .delete-icon {
     background: CanvasText;
   }

@@ -3,6 +3,8 @@ const el = (id) => document.getElementById(id);
 let selected = null;
 let generation = 0;
 let deleting = false;
+let passwordRecord = null;
+let changingPassword = false;
 let reloadTimer;
 let retryTimer;
 function showError(message) {
@@ -71,7 +73,30 @@ async function load() {
         el("deleteDialog").showModal();
         el("cancelDelete").focus();
       });
-      actions.append(button);
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "edit-button";
+      edit.title = "Change PIN or password";
+      edit.setAttribute(
+        "aria-label",
+        `Change PIN or password for ${record.userName || record.displayName || "this account"} on ${record.rpId}`,
+      );
+      const pencil = document.createElement("span");
+      pencil.className = "edit-icon";
+      pencil.setAttribute("aria-hidden", "true");
+      edit.append(pencil);
+      edit.addEventListener("click", () => {
+        if (deleting || changingPassword) return;
+        passwordRecord = record;
+        el("passwordForm").reset();
+        el("passwordError").hidden = true;
+        el("passwordError").textContent = "";
+        el("passwordAccount").textContent =
+          `${record.userName || record.displayName || "Account"} · ${website(record)}`;
+        el("passwordDialog").showModal();
+        el("currentSecret").focus();
+      });
+      actions.append(edit, button);
       row.append(actions);
       rows.append(row);
     }
@@ -131,3 +156,57 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) scheduleLoad();
 });
 load();
+
+el("cancelPassword").addEventListener("click", () => {
+  if (!changingPassword) el("passwordDialog").close();
+});
+el("passwordDialog").addEventListener("cancel", (event) => {
+  if (changingPassword) event.preventDefault();
+});
+el("passwordDialog").addEventListener("close", () => {
+  passwordRecord = null;
+  el("passwordForm").reset();
+  document.querySelector(".table-wrap").focus();
+});
+el("passwordForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (changingPassword || deleting || !passwordRecord) return;
+  const error = el("passwordError");
+  error.hidden = true;
+  if (el("newSecret").value !== el("confirmSecret").value) {
+    error.textContent = "The new PINs or passwords do not match.";
+    error.hidden = false;
+    el("confirmSecret").focus();
+    return;
+  }
+  changingPassword = true;
+  const controls = [...el("passwordForm").querySelectorAll("input, button")];
+  controls.forEach((control) => {
+    control.disabled = true;
+  });
+  el("savePassword").textContent = "Saving…";
+  try {
+    const request = browser.runtime.sendMessage({
+      type: "passkeys:change-secret",
+      credentialId: passwordRecord.credentialId,
+      currentSecret: el("currentSecret").value,
+      newSecret: el("newSecret").value,
+    });
+    el("passwordForm").reset();
+    const result = await request;
+    if (!result?.ok)
+      throw new Error(result?.error || "Could not change the PIN or password.");
+    el("managementNotice").textContent = "PIN or password changed.";
+    el("passwordDialog").close();
+  } catch (failure) {
+    error.textContent = failure.message;
+    error.hidden = false;
+  } finally {
+    changingPassword = false;
+    controls.forEach((control) => {
+      control.disabled = false;
+    });
+    el("savePassword").textContent = "Save";
+    if (el("passwordDialog").open) el("currentSecret").focus();
+  }
+});

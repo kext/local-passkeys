@@ -86,6 +86,61 @@ App.keys = {
       privateBytes.fill(0);
     }
   },
+  async changeSecret(record, currentSecret, newSecret) {
+    if (record.encryption.algorithm !== "AES-GCM" || record.algorithm !== -7)
+      throw new Error("Unsupported stored key.");
+    const oldKey = await this.derive(currentSecret, record.kdf);
+    let plain;
+    try {
+      plain = new Uint8Array(
+        await crypto.subtle.decrypt(
+          {
+            name: "AES-GCM",
+            iv: App.unb64(record.encryption.nonce),
+            additionalData: this.aad(record),
+            tagLength: 128,
+          },
+          oldKey,
+          App.unb64(record.encryptedPrivateKey),
+        ),
+      );
+    } catch {
+      throw new Error("Incorrect current PIN or password, or damaged passkey.");
+    }
+    try {
+      const kdf = {
+        algorithm: "PBKDF2",
+        hash: "SHA-256",
+        iterations: 600000,
+        salt: App.b64(App.random(16)),
+      };
+      const key = await this.derive(newSecret, kdf);
+      const iv = App.random(12);
+      const encryptedPrivateKey = App.b64(
+        await crypto.subtle.encrypt(
+          {
+            name: "AES-GCM",
+            iv,
+            additionalData: this.aad(record),
+            tagLength: 128,
+          },
+          key,
+          plain,
+        ),
+      );
+      return {
+        kdf,
+        encryption: {
+          algorithm: "AES-GCM",
+          nonce: App.b64(iv),
+          tagLength: 128,
+        },
+        encryptedPrivateKey,
+      };
+    } finally {
+      plain.fill(0);
+    }
+  },
   async sign(record, secret, data) {
     if (record.encryption.algorithm !== "AES-GCM" || record.algorithm !== -7)
       throw new Error("Unsupported stored key.");

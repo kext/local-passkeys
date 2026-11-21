@@ -22,6 +22,7 @@
         Deleting a passkey here removes its private key from this add-on. It
         does not remove the website registration.
       </p>
+      <p id="managementNotice" class="note" role="status"></p>
       <div class="toolbar">
         <p id="count" class="count" role="status">Loading passkeys…</p>
       </div>
@@ -77,6 +78,64 @@
           ><button class="danger" type="submit" value="delete">
             Delete passkey
           </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="passwordDialog"
+      class="dialog"
+      aria-labelledby="passwordTitle"
+      aria-describedby="passwordDescription passwordAccount"
+    >
+      <form id="passwordForm">
+        <h2 id="passwordTitle">Change PIN or password</h2>
+        <p id="passwordAccount" class="dialog-account"></p>
+        <p id="passwordDescription" class="muted">
+          Changes how you unlock this passkey on this device. Your passkey on
+          the website stays the same.
+        </p>
+        <label class="field-label" for="currentSecret"
+          >Current PIN or password</label
+        >
+        <input
+          id="currentSecret"
+          class="field secret-field"
+          type="password"
+          autocomplete="current-password"
+          maxlength="1024"
+          required
+        />
+        <label class="field-label" for="newSecret">New PIN or password</label>
+        <input
+          id="newSecret"
+          class="field secret-field"
+          type="password"
+          autocomplete="new-password"
+          maxlength="1024"
+          required
+        />
+        <label class="field-label" for="confirmSecret"
+          >Confirm new PIN or password</label
+        >
+        <input
+          id="confirmSecret"
+          class="field secret-field"
+          type="password"
+          autocomplete="new-password"
+          maxlength="1024"
+          required
+        />
+        <p
+          id="passwordError"
+          class="message error-message"
+          role="alert"
+          hidden
+        ></p>
+        <div class="actions">
+          <button id="cancelPassword" class="secondary" type="button">
+            Cancel
+          </button>
+          <button id="savePassword" class="primary" type="submit">Save</button>
         </div>
       </form>
     </dialog>

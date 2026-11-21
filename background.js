@@ -159,7 +159,12 @@ browser.runtime.onConnect.addListener((port) => {
   let request;
   port.onDisconnect.addListener(() => cancel(request));
   port.onMessage.addListener(async (message) => {
-    if (request || pending || !["create", "get"].includes(message?.operation)) {
+    if (
+      request ||
+      pending ||
+      managementDeleting ||
+      !["create", "get"].includes(message?.operation)
+    ) {
       port.disconnect();
       return;
     }
