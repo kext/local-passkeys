@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stored passkeys · Local Passkeys</title>
+  <link rel="icon" href="icons/key.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="passkeys.css">
+  <script src="passkeys.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><span class="brand-icon" aria-hidden="true"></span><div><p class="brand">Local Passkeys</p><h1>Stored passkeys</h1></div></header>
+    <p class="description">Manage the passkeys saved in this browser.</p>
+    <p class="note">Deleting a passkey here removes its private key from this add-on. It does not remove the website registration.</p>
+    <div class="toolbar"><p id="count" role="status">Loading passkeys…</p><button id="refresh" type="button">Refresh</button></div>
+    <p id="error" role="alert" hidden></p>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Stored passkeys table">
+      <table>
+        <caption class="sr-only">Passkeys saved in this browser</caption>
+        <thead><tr><th scope="col">Website URL</th><th scope="col">Display name</th><th scope="col">Account name</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody id="entries"></tbody>
+      </table>
+    </div>
+    <p id="empty" hidden>No passkeys are stored yet. Register one through a website that supports passkeys.</p>
+    <p class="footnote">Older entries show the RP ID when the original website URL is unavailable.</p>
+  </main>
+  <dialog id="deleteDialog" aria-labelledby="deleteTitle" aria-describedby="deleteDescription deleteAccount">
+    <form method="dialog">
+      <h2 id="deleteTitle">Delete this passkey?</h2>
+      <p id="deleteAccount"></p>
+      <p id="deleteDescription">This removes the saved private key. You cannot undo this action. Make sure you have another way to sign in.</p>
+      <div class="dialog-actions"><button id="cancelDelete" type="submit" value="cancel" autofocus>Cancel</button><button class="danger" type="submit" value="delete">Delete passkey</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

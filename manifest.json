@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Local Passkeys",
-  "version": "0.2.0",
-  "description": "Local software passkeys with password-encrypted private keys. Experimental.",
+  "version": "0.3.0",
+  "description": "Local software passkeys with encrypted private keys and account management. Experimental.",
   "browser_specific_settings": {
     "gecko": {
       "id": "local-passkeys-prototype@example.invalid",
@@ -15,19 +15,33 @@
     "http://localhost/*",
     "http://127.0.0.1/*"
   ],
+  "icons": {
+    "32": "icons/key.svg",
+    "64": "icons/key.svg",
+    "128": "icons/key.svg"
+  },
   "background": {
     "scripts": [
       "utils.js",
       "storage.js",
       "keys.js",
       "webauthn.js",
-      "background.js"
+      "background.js",
+      "management.js"
     ],
     "persistent": true
   },
   "browser_action": {
     "default_title": "Local Passkeys",
-    "default_popup": "prompt.html"
+    "default_popup": "prompt.html",
+    "default_icon": {
+      "16": "icons/key.svg",
+      "32": "icons/key.svg"
+    }
+  },
+  "options_ui": {
+    "page": "passkeys.html",
+    "open_in_tab": true
   },
   "content_scripts": [
     {
