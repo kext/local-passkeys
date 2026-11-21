@@ -48,8 +48,10 @@ input,
 select {
   font: inherit;
 }
-button,
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 42px;
   padding: 9px 15px;
   border: 1px solid var(--border);
@@ -59,11 +61,61 @@ button,
   font-weight: 600;
   cursor: pointer;
 }
-button:hover:not(:disabled) {
+.button:hover:not(:disabled) {
   border-color: var(--muted);
   background: var(--hover);
 }
-button:focus-visible,
+.button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.button.primary:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+.button.danger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--danger-button-text);
+}
+.button.danger:hover:not(:disabled) {
+  filter: brightness(0.93);
+}
+.button.secondary {
+  color: var(--muted);
+}
+.button.secondary.icon-only {
+  color: var(--text);
+}
+.button.secondary.danger {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--danger);
+}
+.button.secondary.danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+  filter: none;
+}
+.button.icon-only {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  padding: 8px;
+  vertical-align: middle;
+  flex: none;
+}
+.button.icon-only + .button.icon-only {
+  margin-left: 6px;
+}
+.grow {
+  flex: 1;
+}
+.muted {
+  color: var(--muted);
+}
+.button:focus-visible,
 a:focus-visible,
 input[type="checkbox"]:focus-visible,
 .table-wrap:focus-visible {
@@ -78,48 +130,24 @@ a {
   opacity: 0.6;
   cursor: not-allowed;
 }
-.primary {
-  flex: 1;
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
-}
-.primary:hover:not(:disabled) {
-  border-color: var(--accent-hover);
-  background: var(--accent-hover);
-}
-.secondary,
-.muted {
-  color: var(--muted);
-}
-.danger {
-  border-color: var(--danger);
-  background: var(--danger);
-  color: var(--danger-button-text);
-}
-.danger:hover:not(:disabled) {
-  border-color: var(--danger);
-  background: var(--danger);
-  filter: brightness(0.93);
-}
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
 }
-.form-actions {
+.actions.divided {
   justify-content: space-between;
   padding-top: 18px;
   border-top: 1px solid var(--border);
 }
-.field-label {
+.label {
   display: block;
   margin: 18px 0 7px;
   font-size: 13px;
   font-weight: 650;
 }
-.form > .field-label:first-child {
+.form > .label:first-child {
   margin-top: 0;
 }
 .field {
@@ -141,7 +169,7 @@ a {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
-.secret-field {
+.field.secret {
   font-size: 16px;
   letter-spacing: 2px;
 }
@@ -165,17 +193,16 @@ select.field {
   margin: 1px 0 0;
   accent-color: var(--accent);
 }
-.account-label,
-.site-origin,
-.error-message,
-.dialog-account {
+.account,
+.origin,
+.message.error {
   overflow-wrap: anywhere;
 }
-.account-label {
+.account.compact {
   margin: 0;
   font-weight: 550;
 }
-.site-origin {
+.origin {
   margin: 8px 0 22px;
   color: var(--muted);
   font-size: 13px;
@@ -200,18 +227,18 @@ select.field {
   border-radius: 10px;
   font-size: 12px;
 }
-.warning {
+.message.warning {
   border-color: var(--warning-border);
   border-left-width: 3px;
   background: var(--warning-bg);
   color: var(--warning);
 }
-.error-message {
+.message.error {
   border-color: var(--danger);
   background: var(--danger-bg);
   color: var(--danger);
 }
-.error-message:empty,
+.message.error:empty,
 .status:empty {
   display: none;
 }
@@ -233,29 +260,28 @@ select.field {
   vertical-align: -1px;
   animation: spin 800ms linear infinite;
 }
-.popup-page,
-.popup-body {
+.popup {
   width: 380px;
 }
-.popup-content {
+.panel {
   padding: 24px;
   border-top: 4px solid var(--accent);
 }
-.manage-link {
+.link-row {
   margin: 20px 0 0;
   font-size: 13px;
 }
-.manager-content {
+.container {
   max-width: 1100px;
   margin: 52px auto;
   padding: 0 28px;
 }
-.page-header {
+.header {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-.page-heading {
+.heading.large {
   font-size: 28px;
 }
 .brand {
@@ -263,20 +289,29 @@ select.field {
   color: var(--muted);
   font-size: 13px;
 }
-.brand-icon,
-.delete-icon {
+.icon {
   display: block;
   flex: none;
+  width: 20px;
+  height: 20px;
   background: currentColor;
   mask-position: center;
   mask-size: contain;
   mask-repeat: no-repeat;
 }
-.brand-icon {
+.icon.large {
   width: 32px;
   height: 32px;
+}
+.icon.key {
   color: var(--accent);
   mask-image: url("icons/key.svg");
+}
+.icon.pencil {
+  mask-image: url("icons/pencil.svg");
+}
+.icon.trash {
+  mask-image: url("icons/delete.svg");
 }
 .description {
   margin: 22px 0 10px;
@@ -325,58 +360,12 @@ select.field {
 .table tr:last-child td {
   border-bottom: 0;
 }
-.table .row-actions {
+.table .controls {
   width: 120px;
   min-width: 120px;
   white-space: nowrap;
   text-align: right;
   padding: 10px;
-}
-.edit-button,
-.delete-button {
-  display: inline-flex;
-  vertical-align: middle;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  padding: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  flex: none;
-}
-.edit-button {
-  margin-right: 6px;
-  color: var(--text);
-}
-.delete-button {
-  color: var(--danger);
-}
-.edit-button:hover:not(:disabled) {
-  border-color: var(--muted);
-  background: var(--hover);
-}
-.delete-button:hover:not(:disabled) {
-  border-color: var(--danger);
-  background: var(--danger-bg);
-}
-.edit-icon,
-.delete-icon {
-  display: block;
-  flex: none;
-  width: 20px;
-  height: 20px;
-  background: currentColor;
-  mask-position: center;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-}
-.edit-icon {
-  mask-image: url("icons/pencil.svg");
-}
-.delete-icon {
-  mask-image: url("icons/delete.svg");
 }
 .empty {
   padding: 30px 0;
@@ -393,7 +382,7 @@ select.field {
 .dialog::backdrop {
   background: rgb(10 12 24 / 0.5);
 }
-.dialog-account {
+.account {
   font-weight: 600;
 }
 .sr-only {
@@ -435,12 +424,12 @@ select.field {
     --warning-border: #75613c;
   }
   a,
-  .brand-icon {
+  .icon.key {
     color: var(--focus);
   }
 }
 @media (max-width: 600px) {
-  .manager-content {
+  .container {
     margin: 28px auto;
     padding: 0 16px;
   }
@@ -461,8 +450,7 @@ select.field {
   }
 }
 @media (forced-colors: active) {
-  .primary,
-  .danger {
+  .button {
     border: 1px solid ButtonText;
     background: ButtonFace;
     color: ButtonText;
@@ -470,9 +458,7 @@ select.field {
   .field:focus {
     outline: 2px solid Highlight;
   }
-  .brand-icon,
-  .edit-icon,
-  .delete-icon {
+  .icon {
     background: CanvasText;
   }
   .status:not(:empty)::before {

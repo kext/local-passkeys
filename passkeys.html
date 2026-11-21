@@ -9,12 +9,12 @@
     <script src="passkeys.js" defer></script>
   </head>
   <body>
-    <main class="manager-content">
-      <header class="page-header">
-        <span class="brand-icon" aria-hidden="true"></span>
+    <main class="container">
+      <header class="header">
+        <span class="icon large key" aria-hidden="true"></span>
         <div>
           <p class="brand">Local Passkeys</p>
-          <h1 class="page-heading">Stored passkeys</h1>
+          <h1 class="heading large">Stored passkeys</h1>
         </div>
       </header>
       <p class="description">Manage the passkeys saved in this browser.</p>
@@ -26,7 +26,7 @@
       <div class="toolbar">
         <p id="count" class="count" role="status">Loading passkeys…</p>
       </div>
-      <p id="error" class="message error-message" role="alert" hidden></p>
+      <p id="error" class="message error" role="alert" hidden></p>
       <div
         class="table-wrap"
         tabindex="0"
@@ -61,7 +61,7 @@
     >
       <form method="dialog">
         <h2 id="deleteTitle">Delete this passkey?</h2>
-        <p id="deleteAccount" class="dialog-account"></p>
+        <p id="deleteAccount" class="account"></p>
         <p id="deleteDescription" class="muted">
           This removes the saved private key. You cannot undo this action. Make
           sure you have another way to sign in.
@@ -69,13 +69,13 @@
         <div class="actions">
           <button
             id="cancelDelete"
-            class="secondary"
+            class="button secondary"
             type="submit"
             value="cancel"
             autofocus
           >
             Cancel</button
-          ><button class="danger" type="submit" value="delete">
+          ><button class="button danger" type="submit" value="delete">
             Delete passkey
           </button>
         </div>
@@ -89,53 +89,48 @@
     >
       <form id="passwordForm">
         <h2 id="passwordTitle">Change PIN or password</h2>
-        <p id="passwordAccount" class="dialog-account"></p>
+        <p id="passwordAccount" class="account"></p>
         <p id="passwordDescription" class="muted">
           Changes how you unlock this passkey on this device. Your passkey on
           the website stays the same.
         </p>
-        <label class="field-label" for="currentSecret"
-          >Current PIN or password</label
-        >
+        <label class="label" for="currentSecret">Current PIN or password</label>
         <input
           id="currentSecret"
-          class="field secret-field"
+          class="field secret"
           type="password"
           autocomplete="current-password"
           maxlength="1024"
           required
         />
-        <label class="field-label" for="newSecret">New PIN or password</label>
+        <label class="label" for="newSecret">New PIN or password</label>
         <input
           id="newSecret"
-          class="field secret-field"
+          class="field secret"
           type="password"
           autocomplete="new-password"
           maxlength="1024"
           required
         />
-        <label class="field-label" for="confirmSecret"
+        <label class="label" for="confirmSecret"
           >Confirm new PIN or password</label
         >
         <input
           id="confirmSecret"
-          class="field secret-field"
+          class="field secret"
           type="password"
           autocomplete="new-password"
           maxlength="1024"
           required
         />
-        <p
-          id="passwordError"
-          class="message error-message"
-          role="alert"
-          hidden
-        ></p>
+        <p id="passwordError" class="message error" role="alert" hidden></p>
         <div class="actions">
-          <button id="cancelPassword" class="secondary" type="button">
+          <button id="cancelPassword" class="button secondary" type="button">
             Cancel
           </button>
-          <button id="savePassword" class="primary" type="submit">Save</button>
+          <button id="savePassword" class="button primary grow" type="submit">
+            Save
+          </button>
         </div>
       </form>
     </dialog>
