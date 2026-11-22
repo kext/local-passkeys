@@ -1,5 +1,8 @@
 "use strict";
 App.keys = {
+  minIterations: 600_000,
+  maxIterations: 38_400_000,
+  targetDerivationMs: 150,
   aad(record) {
     return App.text(
       JSON.stringify([
@@ -13,9 +16,12 @@ App.keys = {
   },
   async derive(secret, kdf) {
     if (
+      !kdf ||
       kdf.algorithm !== "PBKDF2" ||
       kdf.hash !== "SHA-256" ||
-      kdf.iterations !== 600000
+      !Number.isSafeInteger(kdf.iterations) ||
+      kdf.iterations < 1 ||
+      kdf.iterations > this.maxIterations
     )
       throw new Error("Unsupported derivation settings.");
     const bytes = App.text(secret);
@@ -43,6 +49,26 @@ App.keys = {
       bytes.fill(0);
     }
   },
+  async deriveForEncryption(secret) {
+    const kdf = {
+      algorithm: "PBKDF2",
+      hash: "SHA-256",
+      salt: App.b64(App.random(16)),
+      iterations: this.minIterations,
+    };
+    for (;;) {
+      const start = performance.now();
+      const key = await this.derive(secret, kdf);
+      const elapsed = performance.now() - start;
+      if (
+        elapsed >= this.targetDerivationMs ||
+        kdf.iterations >= this.maxIterations
+      ) {
+        return { key, kdf };
+      }
+      kdf.iterations = Math.min(kdf.iterations * 2, this.maxIterations);
+    }
+  },
   async generate(record, secret) {
     const pair = await crypto.subtle.generateKey(
       { name: "ECDSA", namedCurve: "P-256" },
@@ -53,13 +79,8 @@ App.keys = {
       await crypto.subtle.exportKey("pkcs8", pair.privateKey),
     );
     try {
-      record.kdf = {
-        algorithm: "PBKDF2",
-        hash: "SHA-256",
-        salt: App.b64(App.random(16)),
-        iterations: 600000,
-      };
-      const key = await this.derive(secret, record.kdf);
+      const { key, kdf } = await this.deriveForEncryption(secret);
+      record.kdf = kdf;
       const iv = App.random(12);
       record.encryption = {
         algorithm: "AES-GCM",
@@ -108,13 +129,7 @@ App.keys = {
       throw new Error("Incorrect current PIN or password, or damaged passkey.");
     }
     try {
-      const kdf = {
-        algorithm: "PBKDF2",
-        hash: "SHA-256",
-        iterations: 600000,
-        salt: App.b64(App.random(16)),
-      };
-      const key = await this.derive(newSecret, kdf);
+      const { key, kdf } = await this.deriveForEncryption(newSecret);
       const iv = App.random(12);
       const encryptedPrivateKey = App.b64(
         await crypto.subtle.encrypt(

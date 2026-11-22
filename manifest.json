@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Local Passkeys",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Create and use passkeys stored locally in Firefox, protected by a PIN or password. No account, server, or companion app required.",
   "developer": {
     "name": "kext",
@@ -23,9 +23,9 @@
     "http://127.0.0.1/*"
   ],
   "icons": {
-    "32": "icons/key.svg",
-    "64": "icons/key.svg",
-    "128": "icons/key.svg"
+    "32": "icons/icon.svg",
+    "64": "icons/icon.svg",
+    "128": "icons/icon.svg"
   },
   "background": {
     "scripts": [

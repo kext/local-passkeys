@@ -98,11 +98,11 @@ Deleting a passkey on the website also does not automatically delete its local r
 
 Private keys stay encrypted in the add-on’s local browser storage.
 
-| Data | Protection |
-|---|---|
-| Private keys | AES-256-GCM encryption |
-| Unlocking secrets | Not stored |
-| Account names and display names | Stored without encryption |
+| Data                                       | Protection                |
+| ------------------------------------------ | ------------------------- |
+| Private keys                               | AES-256-GCM encryption    |
+| Unlocking secrets                          | Not stored                |
+| Account names and display names            | Stored without encryption |
 | Website details and credential identifiers | Stored without encryption |
 
 The add-on derives an encryption key from your secret with PBKDF2-HMAC-SHA-256 and 600,000 iterations. Each credential uses a random salt.
@@ -134,14 +134,14 @@ The add-on supports explicit passkey registration and sign-in with ES256 keys.
 
 It does not support every WebAuthn feature:
 
-| Feature | Current limitation |
-|---|---|
-| Autofill | The add-on does not supply passkeys through conditional autofill |
-| Embedded pages | Requests from embedded frames are rejected |
-| RP IDs | The RP ID must exactly match the website hostname |
-| Attestation | Direct and enterprise attestation are unsupported |
-| Additional extensions | Only `credProps` is supported |
-| Concurrent requests | Only one approval request can run at a time |
+| Feature               | Current limitation                                               |
+| --------------------- | ---------------------------------------------------------------- |
+| Autofill              | The add-on does not supply passkeys through conditional autofill |
+| Embedded pages        | Requests from embedded frames are rejected                       |
+| RP IDs                | The RP ID must exactly match the website hostname                |
+| Attestation           | Direct and enterprise attestation are unsupported                |
+| Additional extensions | Only `credProps` is supported                                    |
+| Concurrent requests   | Only one approval request can run at a time                      |
 
 The add-on intercepts website requests rather than joining Firefox’s native passkey picker. Some websites or authentication libraries may not work with it.
 

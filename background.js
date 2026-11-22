@@ -28,14 +28,20 @@ async function active(request) {
     active: true,
     windowId: request.windowId,
   });
-  const window = await browser.windows.get(request.windowId);
-  const tab = tabs[0];
-  return (
-    pending === request &&
-    window.focused &&
-    tab?.id === request.tabId &&
-    new URL(tab.url).origin === request.origin
-  );
+  const tab = tabs.find((item) => item.id === request.tabId);
+  if (!tab || pending !== request) return false;
+  let origin;
+  try {
+    origin = new URL(tab.url).origin;
+  } catch {
+    return false;
+  }
+  if (origin !== request.origin) return false;
+  if (typeof browser.windows?.get === "function") {
+    const window = await browser.windows.get(request.windowId);
+    if (!window.focused) return false;
+  }
+  return pending === request;
 }
 browser.runtime.onConnect.addListener((port) => {
   const sender = port.sender;
@@ -196,7 +202,9 @@ browser.runtime.onConnect.addListener((port) => {
         cancel(request);
         return;
       }
-      await browser.browserAction.openPopup({ windowId: request.windowId });
+      await browser.browserAction.openPopup({
+        windowId: request.windowId,
+      });
     } catch (error) {
       finish(request, {
         error: {

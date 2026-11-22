@@ -2,7 +2,7 @@ import { $ } from "bun";
 
 $.cwd(import.meta.dir);
 
-await $`bun fmt *.js *.html *.css *.json`;
+await $`bun fmt`;
 await $`bunx web-ext lint`;
 await $`bunx web-ext build --overwrite-dest --ignore-files \
   'build.js' \
