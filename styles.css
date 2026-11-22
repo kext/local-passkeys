@@ -48,10 +48,8 @@ input,
 select {
   font: inherit;
 }
+button,
 .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   min-height: 42px;
   padding: 9px 15px;
   border: 1px solid var(--border);
@@ -61,61 +59,11 @@ select {
   font-weight: 600;
   cursor: pointer;
 }
-.button:hover:not(:disabled) {
+button:hover:not(:disabled) {
   border-color: var(--muted);
   background: var(--hover);
 }
-.button.primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
-}
-.button.primary:hover:not(:disabled) {
-  border-color: var(--accent-hover);
-  background: var(--accent-hover);
-}
-.button.danger {
-  border-color: var(--danger);
-  background: var(--danger);
-  color: var(--danger-button-text);
-}
-.button.danger:hover:not(:disabled) {
-  filter: brightness(0.93);
-}
-.button.secondary {
-  color: var(--muted);
-}
-.button.secondary.icon-only {
-  color: var(--text);
-}
-.button.secondary.danger {
-  border-color: var(--border);
-  background: var(--surface);
-  color: var(--danger);
-}
-.button.secondary.danger:hover:not(:disabled) {
-  border-color: var(--danger);
-  background: var(--danger-bg);
-  filter: none;
-}
-.button.icon-only {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  padding: 8px;
-  vertical-align: middle;
-  flex: none;
-}
-.button.icon-only + .button.icon-only {
-  margin-left: 6px;
-}
-.grow {
-  flex: 1;
-}
-.muted {
-  color: var(--muted);
-}
-.button:focus-visible,
+button:focus-visible,
 a:focus-visible,
 input[type="checkbox"]:focus-visible,
 .table-wrap:focus-visible {
@@ -130,24 +78,48 @@ a {
   opacity: 0.6;
   cursor: not-allowed;
 }
+.primary {
+  flex: 1;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.primary:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+.secondary,
+.muted {
+  color: var(--muted);
+}
+.danger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--danger-button-text);
+}
+.danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--danger);
+  filter: brightness(0.93);
+}
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
 }
-.actions.divided {
+.form-actions {
   justify-content: space-between;
   padding-top: 18px;
   border-top: 1px solid var(--border);
 }
-.label {
+.field-label {
   display: block;
   margin: 18px 0 7px;
   font-size: 13px;
   font-weight: 650;
 }
-.form > .label:first-child {
+.form > .field-label:first-child {
   margin-top: 0;
 }
 .field {
@@ -169,7 +141,7 @@ a {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
-.field.secret {
+.secret-field {
   font-size: 16px;
   letter-spacing: 2px;
 }
@@ -193,16 +165,17 @@ select.field {
   margin: 1px 0 0;
   accent-color: var(--accent);
 }
-.account,
-.origin,
-.message.error {
+.account-label,
+.site-origin,
+.error-message,
+.dialog-account {
   overflow-wrap: anywhere;
 }
-.account.compact {
+.account-label {
   margin: 0;
   font-weight: 550;
 }
-.origin {
+.site-origin {
   margin: 8px 0 22px;
   color: var(--muted);
   font-size: 13px;
@@ -227,61 +200,43 @@ select.field {
   border-radius: 10px;
   font-size: 12px;
 }
-.message.warning {
+.warning {
   border-color: var(--warning-border);
   border-left-width: 3px;
   background: var(--warning-bg);
   color: var(--warning);
 }
-.message.error {
+.error-message {
   border-color: var(--danger);
   background: var(--danger-bg);
   color: var(--danger);
 }
-.message.error:empty,
-.status:empty {
+.error-message:empty {
   display: none;
 }
-.status {
-  margin: 12px 0 0;
-  color: var(--muted);
-  text-align: center;
-  font-size: 12px;
-}
-.status:not(:empty)::before {
-  content: "";
-  display: inline-block;
-  width: 11px;
-  height: 11px;
-  margin-right: 8px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  vertical-align: -1px;
-  animation: spin 800ms linear infinite;
-}
-.popup {
+.popup-page,
+.popup-body {
   width: 380px;
 }
-.panel {
+.popup-content {
   padding: 24px;
   border-top: 4px solid var(--accent);
 }
-.link-row {
+.manage-link {
   margin: 20px 0 0;
   font-size: 13px;
 }
-.container {
+.manager-content {
   max-width: 1100px;
   margin: 52px auto;
   padding: 0 28px;
 }
-.header {
+.page-header {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-.heading.large {
+.page-heading {
   font-size: 28px;
 }
 .brand {
@@ -289,29 +244,20 @@ select.field {
   color: var(--muted);
   font-size: 13px;
 }
-.icon {
+.brand-icon,
+.delete-icon {
   display: block;
   flex: none;
-  width: 20px;
-  height: 20px;
   background: currentColor;
   mask-position: center;
   mask-size: contain;
   mask-repeat: no-repeat;
 }
-.icon.large {
+.brand-icon {
   width: 32px;
   height: 32px;
-}
-.icon.key {
   color: var(--accent);
   mask-image: url("icons/key.svg");
-}
-.icon.pencil {
-  mask-image: url("icons/pencil.svg");
-}
-.icon.trash {
-  mask-image: url("icons/delete.svg");
 }
 .description {
   margin: 22px 0 10px;
@@ -360,12 +306,58 @@ select.field {
 .table tr:last-child td {
   border-bottom: 0;
 }
-.table .controls {
+.table .row-actions {
   width: 120px;
   min-width: 120px;
   white-space: nowrap;
   text-align: right;
   padding: 10px;
+}
+.edit-button,
+.delete-button {
+  display: inline-flex;
+  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  flex: none;
+}
+.edit-button {
+  margin-right: 6px;
+  color: var(--text);
+}
+.delete-button {
+  color: var(--danger);
+}
+.edit-button:hover:not(:disabled) {
+  border-color: var(--muted);
+  background: var(--hover);
+}
+.delete-button:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+.edit-icon,
+.delete-icon {
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+.edit-icon {
+  mask-image: url("icons/pencil.svg");
+}
+.delete-icon {
+  mask-image: url("icons/delete.svg");
 }
 .empty {
   padding: 30px 0;
@@ -382,7 +374,7 @@ select.field {
 .dialog::backdrop {
   background: rgb(10 12 24 / 0.5);
 }
-.account {
+.dialog-account {
   font-weight: 600;
 }
 .sr-only {
@@ -424,12 +416,12 @@ select.field {
     --warning-border: #75613c;
   }
   a,
-  .icon.key {
+  .brand-icon {
     color: var(--focus);
   }
 }
 @media (max-width: 600px) {
-  .container {
+  .manager-content {
     margin: 28px auto;
     padding: 0 16px;
   }
@@ -450,7 +442,8 @@ select.field {
   }
 }
 @media (forced-colors: active) {
-  .button {
+  .primary,
+  .danger {
     border: 1px solid ButtonText;
     background: ButtonFace;
     color: ButtonText;
@@ -458,11 +451,32 @@ select.field {
   .field:focus {
     outline: 2px solid Highlight;
   }
-  .icon {
+  .brand-icon,
+  .edit-icon,
+  .delete-icon {
     background: CanvasText;
   }
-  .status:not(:empty)::before {
-    border-color: GrayText;
-    border-top-color: Highlight;
+}
+
+.busy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.button-spinner {
+  display: none;
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.busy-button[aria-busy="true"] .button-spinner {
+  display: block;
+  animation: spin 800ms linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .busy-button[aria-busy="true"] .button-spinner {
+    animation: none;
   }
 }

@@ -2,6 +2,7 @@
 const byId = (id) => document.getElementById(id);
 const port = browser.runtime.connect({ name: "approval-popup" });
 let operation;
+let actionLabel = "Sign in";
 let accounts = [];
 let replaceExisting = false;
 function clearSecrets() {
@@ -11,7 +12,8 @@ function clearSecrets() {
 function busy(value) {
   for (const id of ["account", "secret", "confirm", "makeDefault", "submit"])
     byId(id).disabled = value;
-  byId("status").textContent = value ? "Processing…" : "";
+  byId("submit").setAttribute("aria-busy", String(value));
+  byId("submitLabel").textContent = value ? "Processing…" : actionLabel;
 }
 port.onMessage.addListener((message) => {
   if (message.kind === "close") {
@@ -48,7 +50,8 @@ port.onMessage.addListener((message) => {
   byId("notice").hidden = true;
   byId("manageLink").hidden = true;
   byId("approval").hidden = false;
-  byId("submit").textContent = action;
+  actionLabel = action;
+  byId("submitLabel").textContent = action;
   byId("replacementWarning").hidden = !replaceExisting;
   byId("confirmation").hidden = operation !== "create";
   byId("confirm").required = operation === "create";

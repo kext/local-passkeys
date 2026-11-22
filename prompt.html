@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="popup">
+<html lang="en" class="popup-page">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,24 +7,24 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="prompt.js" defer></script>
   </head>
-  <body class="popup">
-    <main class="panel">
+  <body class="popup-body">
+    <main class="popup-content">
       <h1 id="heading">Local Passkeys</h1>
-      <p id="origin" class="origin">No pending request.</p>
+      <p id="origin" class="site-origin">No pending request.</p>
       <form id="approval" class="form" hidden>
-        <label for="account" class="label">Account</label>
+        <label for="account" class="field-label">Account</label>
         <select id="account" class="field"></select>
-        <p id="accountLabel" class="account compact" hidden></p>
+        <p id="accountLabel" class="account-label" hidden></p>
         <p id="replacementWarning" class="message warning" role="note" hidden>
           A passkey already exists for this account. Replacing it deletes all
           saved private keys for this account on this website. This cannot be
           undone. The old keys will not return if the website rejects
           registration.
         </p>
-        <label for="secret" class="label">PIN or password</label>
+        <label for="secret" class="field-label">PIN or password</label>
         <input
           id="secret"
-          class="field secret"
+          class="field secret-field"
           type="password"
           required
           maxlength="1024"
@@ -32,10 +32,12 @@
           spellcheck="false"
         />
         <div id="confirmation" hidden>
-          <label for="confirm" class="label">Confirm PIN or password</label>
+          <label for="confirm" class="field-label"
+            >Confirm PIN or password</label
+          >
           <input
             id="confirm"
-            class="field secret"
+            class="field secret-field"
             type="password"
             maxlength="1024"
             autocomplete="off"
@@ -49,20 +51,24 @@
           ><input id="makeDefault" type="checkbox" /> Use as default for this
           website</label
         >
-        <p id="error" class="message error" role="alert" aria-live="polite"></p>
-        <div class="actions divided">
-          <button id="cancel" class="button secondary" type="button">
-            Cancel</button
-          ><button id="submit" class="button primary grow" type="submit">
-            Sign in
-          </button>
+        <p
+          id="error"
+          class="message error-message"
+          role="alert"
+          aria-live="polite"
+        ></p>
+        <div class="actions form-actions">
+          <button id="cancel" class="secondary" type="button">Cancel</button
+          ><button id="submit" class="primary busy-button" type="submit" aria-busy="false">
+<svg class="button-spinner" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+<span id="submitLabel" aria-live="polite">Sign in</span>
+</button>
         </div>
-        <p id="status" class="status" role="status" aria-live="polite"></p>
       </form>
       <p id="notice" class="notice" hidden>
         Navigate to a website that supports passkeys to register or sign in.
       </p>
-      <p id="manageLink" class="link-row" hidden>
+      <p id="manageLink" class="manage-link" hidden>
         <a href="passkeys.html" target="_blank" rel="noopener"
           >Manage passkeys</a
         >
