@@ -1,5 +1,5 @@
 "use strict";
-const el = (id) => document.getElementById(id);
+const byId = (id) => document.getElementById(id);
 let selected = null;
 let generation = 0;
 let deleting = false;
@@ -8,8 +8,8 @@ let changingPassword = false;
 let reloadTimer;
 let retryTimer;
 function showError(message) {
-  el("error").textContent = message;
-  el("error").hidden = !message;
+  byId("error").textContent = message;
+  byId("error").hidden = !message;
 }
 function cell(text) {
   const td = document.createElement("td");
@@ -67,11 +67,11 @@ async function load() {
       button.addEventListener("click", () => {
         if (deleting) return;
         selected = record;
-        el("deleteAccount").textContent =
+        byId("deleteAccount").textContent =
           `${record.userName || record.displayName || "Account"} · ${website(record)}`;
-        el("deleteDialog").returnValue = "";
-        el("deleteDialog").showModal();
-        el("cancelDelete").focus();
+        byId("deleteDialog").returnValue = "";
+        byId("deleteDialog").showModal();
+        byId("cancelDelete").focus();
       });
       const edit = document.createElement("button");
       edit.type = "button";
@@ -88,28 +88,28 @@ async function load() {
       edit.addEventListener("click", () => {
         if (deleting || changingPassword) return;
         passwordRecord = record;
-        el("passwordForm").reset();
-        el("passwordError").hidden = true;
-        el("passwordError").textContent = "";
-        el("passwordAccount").textContent =
+        byId("passwordForm").reset();
+        byId("passwordError").hidden = true;
+        byId("passwordError").textContent = "";
+        byId("passwordAccount").textContent =
           `${record.userName || record.displayName || "Account"} · ${website(record)}`;
-        el("passwordDialog").showModal();
-        el("currentSecret").focus();
+        byId("passwordDialog").showModal();
+        byId("currentSecret").focus();
       });
       actions.append(edit, button);
       row.append(actions);
       rows.append(row);
     }
-    el("entries").replaceChildren(rows);
-    el("count").textContent =
+    byId("entries").replaceChildren(rows);
+    byId("count").textContent =
       `${records.length} ${records.length === 1 ? "passkey" : "passkeys"}`;
-    el("empty").hidden = records.length !== 0;
-    if (el("error").dataset.source === "load") showError("");
+    byId("empty").hidden = records.length !== 0;
+    if (byId("error").dataset.source === "load") showError("");
   } catch (error) {
     if (ticket === generation) {
-      el("error").dataset.source = "load";
+      byId("error").dataset.source = "load";
       showError(error.message);
-      el("count").textContent = "Could not load passkeys. Retrying…";
+      byId("count").textContent = "Could not load passkeys. Retrying…";
       retryTimer = setTimeout(load, 3000);
     }
   }
@@ -118,10 +118,10 @@ function scheduleLoad() {
   clearTimeout(reloadTimer);
   reloadTimer = setTimeout(load, 50);
 }
-el("deleteDialog").addEventListener("close", async () => {
+byId("deleteDialog").addEventListener("close", async () => {
   const record = selected;
   selected = null;
-  if (el("deleteDialog").returnValue !== "delete" || !record || deleting)
+  if (byId("deleteDialog").returnValue !== "delete" || !record || deleting)
     return;
   deleting = true;
   showError("");
@@ -133,7 +133,7 @@ el("deleteDialog").addEventListener("close", async () => {
     if (!result?.ok)
       throw new Error(result?.error || "Could not delete the passkey.");
   } catch (error) {
-    el("error").dataset.source = "delete";
+    byId("error").dataset.source = "delete";
     showError(error.message);
   } finally {
     deleting = false;
@@ -157,47 +157,48 @@ document.addEventListener("visibilitychange", () => {
 });
 load();
 
-el("cancelPassword").addEventListener("click", () => {
-  if (!changingPassword) el("passwordDialog").close();
+byId("cancelPassword").addEventListener("click", () => {
+  if (!changingPassword) byId("passwordDialog").close();
 });
-el("passwordDialog").addEventListener("cancel", (event) => {
+byId("passwordDialog").addEventListener("cancel", (event) => {
   if (changingPassword) event.preventDefault();
 });
-el("passwordDialog").addEventListener("close", () => {
+byId("passwordDialog").addEventListener("close", () => {
   passwordRecord = null;
-  el("passwordForm").reset();
+  byId("passwordForm").reset();
   document.querySelector(".table-wrap").focus();
 });
-el("passwordForm").addEventListener("submit", async (event) => {
+byId("passwordForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   if (changingPassword || deleting || !passwordRecord) return;
-  const error = el("passwordError");
+  const error = byId("passwordError");
   error.hidden = true;
-  if (el("newSecret").value !== el("confirmSecret").value) {
+  if (byId("newSecret").value !== byId("confirmSecret").value) {
     error.textContent = "The new PINs or passwords do not match.";
     error.hidden = false;
-    el("confirmSecret").focus();
+    byId("confirmSecret").focus();
     return;
   }
   changingPassword = true;
-  const controls = [...el("passwordForm").querySelectorAll("input, button")];
+  const controls = [...byId("passwordForm").querySelectorAll("input, button")];
   controls.forEach((control) => {
     control.disabled = true;
   });
-  el("savePassword").textContent = "Saving…";
+  byId("savePassword").textContent = "Saving…";
+  byId("savePassword").classList.add("busy");
   try {
     const request = browser.runtime.sendMessage({
       type: "passkeys:change-secret",
       credentialId: passwordRecord.credentialId,
-      currentSecret: el("currentSecret").value,
-      newSecret: el("newSecret").value,
+      currentSecret: byId("currentSecret").value,
+      newSecret: byId("newSecret").value,
     });
-    el("passwordForm").reset();
+    byId("passwordForm").reset();
     const result = await request;
     if (!result?.ok)
       throw new Error(result?.error || "Could not change the PIN or password.");
-    el("managementNotice").textContent = "PIN or password changed.";
-    el("passwordDialog").close();
+    byId("managementNotice").textContent = "PIN or password changed.";
+    byId("passwordDialog").close();
   } catch (failure) {
     error.textContent = failure.message;
     error.hidden = false;
@@ -206,7 +207,8 @@ el("passwordForm").addEventListener("submit", async (event) => {
     controls.forEach((control) => {
       control.disabled = false;
     });
-    el("savePassword").textContent = "Save";
-    if (el("passwordDialog").open) el("currentSecret").focus();
+    byId("savePassword").textContent = "Save";
+    byId("savePassword").classList.remove("busy");
+    if (byId("passwordDialog").open) byId("currentSecret").focus();
   }
 });

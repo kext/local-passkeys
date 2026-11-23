@@ -4,14 +4,15 @@ const port = browser.runtime.connect({ name: "approval-popup" });
 let operation;
 let accounts = [];
 let replaceExisting = false;
+let action = "Sign in";
 function clearSecrets() {
   byId("secret").value = "";
   byId("confirm").value = "";
 }
 function busy(value) {
-  for (const id of ["account", "secret", "confirm", "makeDefault", "submit"])
+  for (const id of ["account", "secret", "confirm", "makeDefault", "submit"]) {
     byId(id).disabled = value;
-  byId("status").textContent = value ? "Processing…" : "";
+  }
 }
 port.onMessage.addListener((message) => {
   if (message.kind === "close") {
@@ -27,6 +28,8 @@ port.onMessage.addListener((message) => {
   }
   if (message.kind === "error") {
     busy(false);
+    byId("submit").textContent = action;
+    byId("submit").classList.remove("busy");
     clearSecrets();
     byId("error").textContent = message.message;
     byId("secret").focus();
@@ -36,7 +39,7 @@ port.onMessage.addListener((message) => {
   operation = message.operation;
   accounts = message.accounts;
   replaceExisting = operation === "create" && message.replacementCount > 0;
-  const action =
+  action =
     operation === "create"
       ? replaceExisting
         ? "Replace passkey"
@@ -49,6 +52,7 @@ port.onMessage.addListener((message) => {
   byId("manageLink").hidden = true;
   byId("approval").hidden = false;
   byId("submit").textContent = action;
+  byId("submit").classList.remove("busy");
   byId("replacementWarning").hidden = !replaceExisting;
   byId("confirmation").hidden = operation !== "create";
   byId("confirm").required = operation === "create";
@@ -115,6 +119,8 @@ byId("approval").addEventListener("submit", (event) => {
   const secret = byId("secret").value;
   clearSecrets();
   busy(true);
+  byId("submit").textContent = "Processing…";
+  byId("submit").classList.add("busy");
   port.postMessage({
     kind: "approve",
     secret,

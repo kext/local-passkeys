@@ -83,7 +83,9 @@ select {
   color: var(--danger-button-text);
 }
 .button.danger:hover:not(:disabled) {
-  filter: brightness(0.93);
+  border-color: var(--danger);
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 .button.secondary {
   color: var(--muted);
@@ -99,7 +101,6 @@ select {
 .button.secondary.danger:hover:not(:disabled) {
   border-color: var(--danger);
   background: var(--danger-bg);
-  filter: none;
 }
 .button.icon-only {
   width: 42px;
@@ -241,26 +242,19 @@ select.field {
   background: var(--danger-bg);
   color: var(--danger);
 }
-.message.error:empty,
-.status:empty {
+.message.error:empty {
   display: none;
 }
-.status {
-  margin: 12px 0 0;
-  color: var(--muted);
-  text-align: center;
-  font-size: 12px;
-}
-.status:not(:empty)::before {
+.busy::before {
   content: "";
   display: inline-block;
-  width: 11px;
-  height: 11px;
+  width: 1em;
+  height: 1em;
   margin-right: 8px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  vertical-align: -1px;
+  vertical-align: -0.125em;
+  mask-image: url("icons/circle-loader.svg");
+  mask-size: contain;
+  background: currentColor;
   animation: spin 800ms linear infinite;
 }
 .popup {
@@ -465,9 +459,5 @@ select.field {
   }
   .icon {
     background: CanvasText;
-  }
-  .status:not(:empty)::before {
-    border-color: GrayText;
-    border-top-color: Highlight;
   }
 }
