@@ -6,10 +6,51 @@ const safeSend = (port, value) => {
     port.postMessage(value);
   } catch {}
 };
+async function closeApprovalTab(request) {
+  if (request.approvalTabId == null) return;
+  try {
+    const tab = await browser.tabs.get(request.approvalTabId);
+    if (tab.active) {
+      try {
+        await browser.tabs.update(request.tabId, { active: true });
+      } catch {}
+    }
+    await browser.tabs.remove(request.approvalTabId);
+  } catch {}
+}
+async function openApproval(request) {
+  const platform = await browser.runtime.getPlatformInfo();
+  if (pending !== request) return;
+  if (platform.os !== "android") {
+    await browser.browserAction.openPopup({ windowId: request.windowId });
+    return;
+  }
+  request.approvalUrl = `${promptUrl}#${crypto.randomUUID()}`;
+  // Record the tab ID before loading the page or activating it.
+  const tab = await browser.tabs.create({
+    url: "about:blank",
+    active: false,
+    windowId: request.windowId,
+  });
+  request.approvalTabId = tab.id;
+  if (pending !== request) {
+    await closeApprovalTab(request);
+    return;
+  }
+  if (!(await active(request))) {
+    cancel(request);
+    return;
+  }
+  await browser.tabs.update(tab.id, {
+    url: request.approvalUrl,
+    active: true,
+  });
+}
 function finish(request, payload) {
   if (pending !== request) return;
   pending = null;
   clearTimeout(request.timer);
+  void closeApprovalTab(request);
   safeSend(request.port, payload);
   if (request.popup) {
     safeSend(request.popup, { kind: "close" });
@@ -28,15 +69,24 @@ async function active(request) {
     active: true,
     windowId: request.windowId,
   });
-  const tab = tabs.find((item) => item.id === request.tabId);
-  if (!tab || pending !== request) return false;
-  let origin;
+  const selected = tabs[0];
+  if (
+    !selected ||
+    (selected.id !== request.tabId && selected.id !== request.approvalTabId)
+  )
+    return false;
+  let original;
   try {
-    origin = new URL(tab.url).origin;
+    original = await browser.tabs.get(request.tabId);
+    if (new URL(original.url).origin !== request.origin) return false;
   } catch {
     return false;
   }
-  if (origin !== request.origin) return false;
+  if (
+    selected.id === request.approvalTabId &&
+    selected.url !== request.approvalUrl
+  )
+    return false;
   if (typeof browser.windows?.get === "function") {
     const window = await browser.windows.get(request.windowId);
     if (!window.focused) return false;
@@ -51,7 +101,13 @@ browser.runtime.onConnect.addListener((port) => {
   }
   if (port.name === "approval-popup") {
     const request = pending;
-    if (sender.url !== promptUrl) {
+    const expectedUrl = request?.approvalUrl || promptUrl;
+    if (
+      sender.url !== expectedUrl ||
+      (request?.approvalUrl &&
+        (sender.tab?.id !== request.approvalTabId || sender.frameId !== 0)) ||
+      (!request?.approvalUrl && sender.tab)
+    ) {
       port.disconnect();
       return;
     }
@@ -202,9 +258,7 @@ browser.runtime.onConnect.addListener((port) => {
         cancel(request);
         return;
       }
-      await browser.browserAction.openPopup({
-        windowId: request.windowId,
-      });
+      await openApproval(request);
     } catch (error) {
       finish(request, {
         error: {
@@ -216,17 +270,27 @@ browser.runtime.onConnect.addListener((port) => {
   });
 });
 browser.tabs.onUpdated.addListener((tabId, change) => {
+  if (
+    pending?.approvalTabId === tabId &&
+    change.url &&
+    change.url !== pending.approvalUrl
+  ) {
+    cancel(pending);
+    return;
+  }
   if (pending?.tabId === tabId && (change.status === "loading" || change.url))
     cancel(pending);
 });
 browser.tabs.onRemoved.addListener((tabId) => {
-  if (pending?.tabId === tabId) cancel(pending);
+  if (pending && (pending.tabId === tabId || pending.approvalTabId === tabId))
+    cancel(pending);
 });
 browser.tabs.onActivated.addListener((info) => {
   if (
     pending &&
     info.windowId === pending.windowId &&
-    info.tabId !== pending.tabId
+    info.tabId !== pending.tabId &&
+    info.tabId !== pending.approvalTabId
   )
     cancel(pending);
 });
