@@ -53,15 +53,15 @@ async function load() {
       site.title = record.rpId;
       row.append(site, cell(record.displayName), cell(record.userName));
       const actions = document.createElement("td");
-      actions.className = "row-actions";
+      actions.className = "controls";
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "delete-button";
+      button.className = "button secondary danger icon-only";
       const label = `Delete passkey for ${record.userName || record.displayName || "this account"} on ${record.rpId}`;
       button.setAttribute("aria-label", label);
       button.title = label;
       const icon = document.createElement("span");
-      icon.className = "delete-icon";
+      icon.className = "icon trash";
       icon.setAttribute("aria-hidden", "true");
       button.append(icon);
       button.addEventListener("click", () => {
@@ -75,14 +75,14 @@ async function load() {
       });
       const edit = document.createElement("button");
       edit.type = "button";
-      edit.className = "edit-button";
+      edit.className = "button secondary icon-only";
       edit.title = "Change PIN or password";
       edit.setAttribute(
         "aria-label",
         `Change PIN or password for ${record.userName || record.displayName || "this account"} on ${record.rpId}`,
       );
       const pencil = document.createElement("span");
-      pencil.className = "edit-icon";
+      pencil.className = "icon pencil";
       pencil.setAttribute("aria-hidden", "true");
       edit.append(pencil);
       edit.addEventListener("click", () => {
@@ -184,8 +184,7 @@ el("passwordForm").addEventListener("submit", async (event) => {
   controls.forEach((control) => {
     control.disabled = true;
   });
-  el("savePassword").setAttribute("aria-busy", "true");
-  el("savePasswordLabel").textContent = "Saving…";
+  el("savePassword").textContent = "Saving…";
   try {
     const request = browser.runtime.sendMessage({
       type: "passkeys:change-secret",
@@ -207,8 +206,7 @@ el("passwordForm").addEventListener("submit", async (event) => {
     controls.forEach((control) => {
       control.disabled = false;
     });
-    el("savePassword").setAttribute("aria-busy", "false");
-    el("savePasswordLabel").textContent = "Save";
+    el("savePassword").textContent = "Save";
     if (el("passwordDialog").open) el("currentSecret").focus();
   }
 });
