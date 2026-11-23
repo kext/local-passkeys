@@ -48,6 +48,9 @@ input,
 select {
   font: inherit;
 }
+.accent {
+  color: var(--accent);
+}
 .button {
   display: inline-flex;
   align-items: center;
@@ -304,7 +307,6 @@ select.field {
   height: 32px;
 }
 .icon.key {
-  color: var(--accent);
   mask-image: url("icons/key.svg");
 }
 .icon.pencil {
@@ -312,6 +314,9 @@ select.field {
 }
 .icon.trash {
   mask-image: url("icons/delete.svg");
+}
+.icon.circle-loader {
+  mask-image: url("icons/circle-loader.svg");
 }
 .description {
   margin: 22px 0 10px;
